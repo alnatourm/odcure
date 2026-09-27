@@ -1,0 +1,66 @@
+@import "tailwindcss";
+
+@layer base {
+  :root {
+    --font-headline: 'Manrope', sans-serif;
+    --font-body: 'IBM Plex Sans', 'IBM Plex Sans Arabic', sans-serif;
+  }
+
+  body {
+    font-family: var(--font-body);
+    background-color: #f8f9ff;
+    color: #0b1c30;
+    margin: 0;
+    padding: 0;
+    overscroll-behavior: none;
+  }
+}
+
+/* Custom Material Symbols styling */
+.material-symbols-outlined {
+  font-family: 'Material Symbols Outlined';
+  font-weight: normal;
+  font-style: normal;
+  font-size: 24px;
+  line-height: 1;
+  letter-spacing: normal;
+  text-transform: none;
+  display: inline-block;
+  white-space: nowrap;
+  word-wrap: normal;
+  direction: ltr;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Blueprint dot pattern for workflow builder canvas */
+.blueprint-dots {
+  background-image: radial-gradient(#bcc9c6 1.2px, transparent 1.2px);
+  background-size: 24px 24px;
+}
+
+/* Custom thin scrollbars for dense data views */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 9999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+/* Watermark overlay effect for viewer */
+.document-watermark {
+  background-image: repeating-linear-gradient(
+    -45deg,
+    rgba(0, 104, 95, 0.04),
+    rgba(0, 104, 95, 0.04) 100px,
+    transparent 100px,
+    transparent 200px
+  );
+}
