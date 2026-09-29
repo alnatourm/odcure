@@ -16,8 +16,236 @@ export const WorkflowBuilder: React.FC<WorkflowBuilderProps> = ({
   onCloneTemplate,
   onShowToast,
 }) => {
+  const [activeViewMode, setActiveViewMode] = useState<'canvas' | 'directory'>('directory');
+  
+  // List of Created Enterprise Workflow Templates
+  const [templateList, setTemplateList] = useState<WorkflowTemplate[]>([
+    template,
+    {
+      id: 'WF-TMPL-02',
+      name: 'Procurement & Supply Chain Vendor Onboarding',
+      nameAr: 'سلسلة الإمداد والمشتريات واعتماد الموردين',
+      version: 'v1.8',
+      targetScope: 'Supply Chain, Vendor Contracts & Invoices',
+      topology: '4-Stage Sequential Route',
+      maxSlaHours: 72,
+      isAuditEnforced: true,
+      nodes: [
+        {
+          id: 'NODE-P1',
+          stageNumber: 1,
+          stageType: 'SERIAL',
+          name: 'Procurement Specialist Initial Audit',
+          nameAr: 'تدقيق أخصائي المشتريات المبدئي',
+          subtitle: 'Serial Route (SLA: 24 Hours)',
+          subtitleAr: 'التحقق من كراسة الشروط والعروض',
+          assignedRole: 'Procurement Officer',
+          slaHours: 24,
+          reminderHours: 12,
+          allowDelegation: true,
+          allowedActions: ['Approve', 'Reject', 'Request Changes'],
+          escalationTarget: 'Procurement Manager',
+          entryStatus: 'Vendor File Uploaded',
+          passStatus: 'Procurement Cleared',
+          rejectStatus: 'Vendor Rejected',
+        },
+        {
+          id: 'NODE-P2',
+          stageNumber: 2,
+          stageType: 'PARALLEL',
+          name: 'Legal & Risk Assessment',
+          nameAr: 'الفرع القانوني وتقييم مخاطر العقود',
+          subtitle: 'Parallel Route (SLA: 24 Hours)',
+          subtitleAr: 'مراجعة بنود التعاقد والضمانات',
+          assignedRole: 'Legal Counsel',
+          slaHours: 24,
+          reminderHours: 12,
+          allowDelegation: true,
+          allowedActions: ['Approve', 'Reject', 'Request Changes'],
+          escalationTarget: 'General Counsel',
+          entryStatus: 'Under Legal Review',
+          passStatus: 'Legal Approved',
+          rejectStatus: 'Legal Objection',
+        },
+        {
+          id: 'NODE-P3',
+          stageNumber: 3,
+          stageType: 'SERIAL',
+          name: 'CFO Budget & Payment Authorization',
+          nameAr: 'اعتماد الموازنة والدفع من المدير المالي',
+          subtitle: 'Serial Route (SLA: 24 Hours)',
+          subtitleAr: 'الموافقة على الصرف والارتباط المالي',
+          assignedRole: 'Chief Financial Officer',
+          slaHours: 24,
+          reminderHours: 12,
+          allowDelegation: false,
+          allowedActions: ['Approve', 'Reject', 'Re-assign'],
+          escalationTarget: 'Finance Controller',
+          entryStatus: 'Pending CFO Approval',
+          passStatus: 'Payment Authorized',
+          rejectStatus: 'Budget Rejected',
+        },
+      ],
+    },
+    {
+      id: 'WF-TMPL-03',
+      name: 'HR Policies & Staffing Clearance Fast-Track',
+      nameAr: 'الموارد البشرية وسياسات التوظيف السريع',
+      version: 'v3.1',
+      targetScope: 'HR Policies, Payroll Adjustments & Staffing',
+      topology: '3-Stage Fast-Track',
+      maxSlaHours: 48,
+      isAuditEnforced: true,
+      nodes: [
+        {
+          id: 'NODE-H1',
+          stageNumber: 1,
+          stageType: 'SERIAL',
+          name: 'HR Operations Verification',
+          nameAr: 'التحقق من عمليات الموارد البشرية',
+          subtitle: 'SLA: 12 Hours',
+          subtitleAr: 'مراجعة بيانات الموظف والدرجة الوظيفية',
+          assignedRole: 'HR Operations Officer',
+          slaHours: 12,
+          reminderHours: 6,
+          allowDelegation: true,
+          allowedActions: ['Approve', 'Reject'],
+          escalationTarget: 'HR Director',
+          entryStatus: 'HR File Created',
+          passStatus: 'HR Verified',
+          rejectStatus: 'HR Rejected',
+        },
+        {
+          id: 'NODE-H2',
+          stageNumber: 2,
+          stageType: 'SERIAL',
+          name: 'Department Manager Authorization',
+          nameAr: 'اعتماد مدير القسم المعني',
+          subtitle: 'SLA: 24 Hours',
+          subtitleAr: 'موافقة رئيس القسم المباشر',
+          assignedRole: 'Department Head',
+          slaHours: 24,
+          reminderHours: 12,
+          allowDelegation: true,
+          allowedActions: ['Approve', 'Reject', 'Request Changes'],
+          escalationTarget: 'VP Operations',
+          entryStatus: 'Pending Manager Sign-off',
+          passStatus: 'Manager Signed',
+          rejectStatus: 'Declined by Dept Head',
+        },
+      ],
+    },
+    {
+      id: 'WF-TMPL-04',
+      name: 'IT Infrastructure & Cybersecurity Clearance',
+      nameAr: 'الأمن السايبراني والبنية التحتية والوصول للمشاريع',
+      version: 'v2.0',
+      targetScope: 'IT Logs, KMS Key Requests & Infrastructure',
+      topology: '4-Stage SecOps Gate',
+      maxSlaHours: 24,
+      isAuditEnforced: true,
+      nodes: [
+        {
+          id: 'NODE-S1',
+          stageNumber: 1,
+          stageType: 'CONDITIONAL',
+          name: 'Automated SecOps Risk Scanning',
+          nameAr: 'الفحص السايبراني الآلي وتقييم المخاطر',
+          subtitle: 'Conditional Rule Gate',
+          subtitleAr: 'التحقق من تشفير البيانات والصلاحيات',
+          assignedRole: 'Automated SecOps Engine',
+          slaHours: 1,
+          reminderHours: 0,
+          allowDelegation: false,
+          allowedActions: ['Approve'],
+          escalationTarget: 'CISO',
+          entryStatus: 'Scanning Code/Doc',
+          passStatus: 'SecOps Clean',
+          rejectStatus: 'Security Threat Blocked',
+        },
+      ],
+    },
+    {
+      id: 'WF-TMPL-05',
+      name: 'High-Value CAPEX Capital Project Matrix (> $100K)',
+      nameAr: 'المشاريع الهندسية والرأسمالية الكبرى (أكثر من 100 ألف دولار)',
+      version: 'v1.0 (Draft)',
+      targetScope: 'CAPEX Investments, Engineering & Capital Projects',
+      topology: '6-Stage Board Governance',
+      maxSlaHours: 120,
+      isAuditEnforced: true,
+      nodes: [
+        {
+          id: 'NODE-C1',
+          stageNumber: 1,
+          stageType: 'SERIAL',
+          name: 'Engineering Director Feasibility Approval',
+          nameAr: 'موافقة مدير الهندسة والجدوى الاقتصادية',
+          subtitle: 'SLA: 48 Hours',
+          subtitleAr: 'دراسة الجدوى والتصاميم الهندسية',
+          assignedRole: 'Engineering Director',
+          slaHours: 48,
+          reminderHours: 24,
+          allowDelegation: false,
+          allowedActions: ['Approve', 'Reject', 'Request Changes'],
+          escalationTarget: 'CEO',
+          entryStatus: 'CAPEX Proposal Lodged',
+          passStatus: 'Engineering Endorsed',
+          rejectStatus: 'CAPEX Rejected',
+        },
+      ],
+    },
+  ]);
+
+  const [activeTemplateId, setActiveTemplateId] = useState<string>(template.id);
+  const currentActiveTemplate = templateList.find((t) => t.id === activeTemplateId) || template;
+
   const [selectedNodeId, setSelectedNodeId] = useState<string>('NODE-03');
-  const [nodes, setNodes] = useState<WorkflowNodeConfig[]>(template.nodes);
+  const [nodes, setNodes] = useState<WorkflowNodeConfig[]>(currentActiveTemplate.nodes);
+
+  // Sync nodes when active template changes
+  const handleSelectTemplate = (t: WorkflowTemplate, openCanvas: boolean = false) => {
+    setActiveTemplateId(t.id);
+    setNodes(t.nodes || []);
+    if (t.nodes && t.nodes.length > 0) {
+      setSelectedNodeId(t.nodes[0].id);
+    }
+    if (openCanvas) {
+      setActiveViewMode('canvas');
+    }
+    onSaveTemplate(t);
+    onShowToast(
+      lang === 'AR'
+        ? openCanvas
+          ? `تم فتح المخطط التفاعلي للقالب: ${t.nameAr}`
+          : `تم اختيار وعرض تفاصيل القالب: ${t.nameAr}`
+        : openCanvas
+          ? `Opened Interactive Canvas for: ${t.name}`
+          : `Selected Template: ${t.name}`
+    );
+  };
+
+  const handleCreateNewTemplate = () => {
+    const newId = `WF-TMPL-0${templateList.length + 1}`;
+    const newTmpl: WorkflowTemplate = {
+      id: newId,
+      name: `Custom Enterprise Workflow ${newId}`,
+      nameAr: `مسار عمل خاص جديد ${newId}`,
+      version: 'v1.0',
+      targetScope: 'General Department Operations',
+      topology: '3-Stage Serial Mesh',
+      maxSlaHours: 48,
+      isAuditEnforced: true,
+      nodes: template.nodes,
+    };
+    setTemplateList((prev) => [newTmpl, ...prev]);
+    handleSelectTemplate(newTmpl, false);
+    onShowToast(
+      lang === 'AR'
+        ? `تم إنشاء قالب مسار عمل جديد (${newId})`
+        : `New workflow template created (${newId})!`
+    );
+  };
 
   const selectedNode = nodes.find((n) => n.id === selectedNodeId) || nodes[0];
 
@@ -28,7 +256,11 @@ export const WorkflowBuilder: React.FC<WorkflowBuilderProps> = ({
   };
 
   const handleApplyStage = () => {
-    onSaveTemplate({ ...template, nodes });
+    const updated = { ...currentActiveTemplate, nodes };
+    onSaveTemplate(updated);
+    setTemplateList((prev) =>
+      prev.map((t) => (t.id === updated.id ? updated : t))
+    );
     onShowToast(`Configuration updated for ${selectedNode.name}`);
   };
 
@@ -61,7 +293,7 @@ export const WorkflowBuilder: React.FC<WorkflowBuilderProps> = ({
           <div className="flex items-center gap-2 bg-[#eff4ff] px-3 py-1.5 rounded-full border border-[#cbd5e1]/40 text-xs">
             <span className="material-symbols-outlined text-[#00685f] text-base">verified</span>
             <span className="font-semibold text-[#0b1c30]">
-              Version: {template.version} | الإصدار: 2.4 نشط
+              Active Template: {currentActiveTemplate.id} ({currentActiveTemplate.version})
             </span>
           </div>
 
@@ -85,7 +317,7 @@ export const WorkflowBuilder: React.FC<WorkflowBuilderProps> = ({
 
           <button
             type="button"
-            onClick={() => onShowToast('New workflow template wizard initialized')}
+            onClick={handleCreateNewTemplate}
             className="flex items-center gap-1.5 px-5 py-2 rounded-full bg-[#00685f] text-white hover:bg-[#008378] shadow-sm transition-all text-xs font-semibold cursor-pointer"
           >
             <span className="material-symbols-outlined text-base">add_circle</span>
@@ -94,6 +326,214 @@ export const WorkflowBuilder: React.FC<WorkflowBuilderProps> = ({
         </div>
       </section>
 
+      {/* View Switcher Bar */}
+      <section className="bg-white rounded-2xl p-2.5 border border-[#cbd5e1]/30 shadow-xs flex flex-col sm:flex-row items-center justify-between gap-3">
+        <div className="flex items-center gap-2 w-full sm:w-auto">
+          <button
+            type="button"
+            onClick={() => setActiveViewMode('directory')}
+            className={`flex-1 sm:flex-initial px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-2 cursor-pointer ${
+              activeViewMode === 'directory'
+                ? 'bg-[#00685f] text-white shadow-xs'
+                : 'bg-[#eff4ff] text-[#475569] hover:text-[#0b1c30]'
+            }`}
+          >
+            <span className="material-symbols-outlined text-base">format_list_bulleted</span>
+            <span>Created Workflow Templates ({templateList.length}) | قائمة القوالب المعتمدة</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => setActiveViewMode('canvas')}
+            className={`flex-1 sm:flex-initial px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-2 cursor-pointer ${
+              activeViewMode === 'canvas'
+                ? 'bg-[#00685f] text-white shadow-xs'
+                : 'bg-[#eff4ff] text-[#475569] hover:text-[#0b1c30]'
+            }`}
+          >
+            <span className="material-symbols-outlined text-base">account_tree</span>
+            <span>Visual Graph Canvas Builder | منشئ المسار التفاعلي</span>
+          </button>
+        </div>
+
+        <div className="text-xs text-[#64748b] font-medium hidden md:block">
+          Editing: <span className="font-bold text-[#00685f]">{currentActiveTemplate.name}</span>
+        </div>
+      </section>
+
+      {/* Created Workflow Templates Directory Table */}
+      {activeViewMode === 'directory' && (
+        <section className="bg-white rounded-2xl p-6 border border-[#cbd5e1]/30 shadow-xs space-y-4 animate-in fade-in duration-200">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-[#cbd5e1]/30 pb-4">
+            <div>
+              <h2 className="font-extrabold text-base text-[#0b1c30] flex items-center gap-2">
+                <span className="material-symbols-outlined text-[#00685f]">folder_managed</span>
+                <span>Active Created Enterprise Workflow Templates</span>
+              </h2>
+              <p className="text-xs text-[#64748b]">
+                قائمة قوالب مسارات العمل المعتمدة ومسارات الاعتماد التلقائية للأقسام
+              </p>
+            </div>
+
+            <button
+              type="button"
+              onClick={handleCreateNewTemplate}
+              className="px-4 py-2 rounded-xl bg-[#00685f] hover:bg-[#00524b] text-white text-xs font-bold shadow-xs transition-all flex items-center gap-2 cursor-pointer"
+            >
+              <span className="material-symbols-outlined text-base">add</span>
+              <span>Create Workflow Template</span>
+            </button>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {templateList.map((t) => {
+              const isSelected = t.id === activeTemplateId;
+              return (
+                <div
+                  key={t.id}
+                  onClick={() => handleSelectTemplate(t, false)}
+                  className={`p-5 rounded-2xl border transition-all flex flex-col justify-between space-y-4 cursor-pointer hover:shadow-md ${
+                    isSelected
+                      ? 'bg-[#00685f]/5 border-[#00685f] ring-2 ring-[#00685f]'
+                      : 'bg-white hover:bg-[#eff4ff]/60 border-[#cbd5e1]/40'
+                  }`}
+                >
+                  <div className="space-y-2">
+                    <div className="flex items-center justify-between">
+                      <span className="text-[0.65rem] font-mono font-bold bg-[#eff4ff] text-[#00685f] px-2 py-0.5 rounded-md border border-[#cbd5e1]/30">
+                        {t.id} • {t.version}
+                      </span>
+                      {isSelected ? (
+                        <span className="text-[0.65rem] bg-[#00685f] text-white px-2 py-0.5 rounded-full font-bold">
+                          SELECTED
+                        </span>
+                      ) : (
+                        <span className="text-[0.65rem] bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded-full font-bold">
+                          ACTIVE
+                        </span>
+                      )}
+                    </div>
+
+                    <div>
+                      <h3 className="font-bold text-sm text-[#0b1c30] leading-snug">{t.name}</h3>
+                      <p className="text-xs text-[#64748b] pt-0.5">{t.nameAr}</p>
+                    </div>
+
+                    <div className="p-2.5 rounded-xl bg-[#eff4ff]/60 text-xs space-y-1">
+                      <div className="flex items-center justify-between text-[#475569]">
+                        <span>Scope:</span>
+                        <span className="font-semibold text-[#0b1c30] truncate max-w-[180px]">
+                          {t.targetScope}
+                        </span>
+                      </div>
+                      <div className="flex items-center justify-between text-[#475569]">
+                        <span>Topology & Stages:</span>
+                        <span className="font-semibold text-[#00685f]">
+                          {t.nodes.length} Stages • {t.topology}
+                        </span>
+                      </div>
+                      <div className="flex items-center justify-between text-[#475569]">
+                        <span>Max SLA Deadline:</span>
+                        <span className="font-semibold text-[#0b1c30]">{t.maxSlaHours} Hours</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="pt-2 border-t border-[#cbd5e1]/30 flex items-center gap-2">
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleSelectTemplate(t, true);
+                      }}
+                      className={`flex-1 py-2.5 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer ${
+                        isSelected
+                          ? 'bg-[#00685f] text-white shadow-xs'
+                          : 'bg-[#00685f]/10 hover:bg-[#00685f] hover:text-white text-[#00685f]'
+                      }`}
+                    >
+                      <span className="material-symbols-outlined text-sm">account_tree</span>
+                      <span>
+                        {isSelected
+                          ? lang === 'AR'
+                            ? 'فتح المخطط والتعديل'
+                            : 'Open Canvas to Edit'
+                          : lang === 'AR'
+                          ? 'عرض البيانات وفتح المخطط'
+                          : 'Select & Open Canvas'}
+                      </span>
+                    </button>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+
+          {/* Selected Template Stage Overview Panel */}
+          <div className="mt-6 p-5 rounded-2xl bg-[#eff4ff]/50 border border-[#cbd5e1]/50 space-y-4">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-[#cbd5e1]/30 pb-3">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl bg-[#00685f] text-white flex items-center justify-center font-bold shadow-xs">
+                  <span className="material-symbols-outlined text-xl">folder_special</span>
+                </div>
+                <div>
+                  <div className="flex items-center gap-2">
+                    <span className="font-mono text-xs font-bold text-[#00685f] bg-white px-2 py-0.5 rounded border border-[#cbd5e1]/30">
+                      {currentActiveTemplate.id}
+                    </span>
+                    <span className="text-xs font-bold text-[#475569]">
+                      {currentActiveTemplate.version}
+                    </span>
+                  </div>
+                  <h3 className="text-base font-extrabold text-[#0b1c30]">
+                    {currentActiveTemplate.name}
+                  </h3>
+                  <p className="text-xs text-[#64748b]">{currentActiveTemplate.nameAr}</p>
+                </div>
+              </div>
+
+              <button
+                type="button"
+                onClick={() => handleSelectTemplate(currentActiveTemplate, true)}
+                className="px-5 py-2.5 rounded-xl bg-[#00685f] hover:bg-[#00524b] text-white text-xs font-bold shadow-sm transition-all flex items-center gap-2 cursor-pointer shrink-0"
+              >
+                <span className="material-symbols-outlined text-base">account_tree</span>
+                <span>
+                  {lang === 'AR'
+                    ? 'فتح المخطط التفاعلي للقالب المختار'
+                    : 'Open Canvas for Selected Template'}
+                </span>
+              </button>
+            </div>
+
+            {/* Stages Sequence Cards Preview */}
+            <div className="space-y-2">
+              <h4 className="text-xs font-bold text-[#0b1c30] uppercase tracking-wider flex items-center gap-1.5">
+                <span className="material-symbols-outlined text-sm text-[#00685f]">conversion_path</span>
+                <span>Pipeline Stage Overview ({currentActiveTemplate.nodes.length} Stages)</span>
+              </h4>
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-2.5 pt-1">
+                {currentActiveTemplate.nodes.map((node, idx) => (
+                  <div
+                    key={node.id}
+                    className="p-3 rounded-xl bg-white border border-[#cbd5e1]/40 shadow-2xs space-y-1.5"
+                  >
+                    <div className="flex items-center justify-between">
+                      <span className="text-[0.65rem] font-mono font-bold text-[#00685f] bg-[#eff4ff] px-1.5 py-0.5 rounded">
+                        Stage {idx + 1}
+                      </span>
+                      <span className="text-[0.65rem] font-bold text-[#475569]">{node.slaHours}h SLA</span>
+                    </div>
+                    <div className="font-bold text-xs text-[#0b1c30] line-clamp-1">{node.name}</div>
+                    <div className="text-[0.65rem] text-[#64748b] line-clamp-1">{node.assignedRole || node.subtitle}</div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </section>
+      )}
+
       {/* Template Meta Card & Quick Stats Bar */}
       <section className="grid grid-cols-1 md:grid-cols-4 gap-4">
         <div className="bg-white rounded-2xl p-4 shadow-xs border border-[#cbd5e1]/30 flex items-center justify-between">
@@ -101,7 +541,7 @@ export const WorkflowBuilder: React.FC<WorkflowBuilderProps> = ({
             <span className="text-[0.7rem] uppercase text-[#64748b] font-medium">
               Target Document Scope
             </span>
-            <span className="text-base font-bold text-[#0b1c30]">{template.targetScope}</span>
+            <span className="text-base font-bold text-[#0b1c30]">{currentActiveTemplate.targetScope}</span>
             <span className="text-[0.65rem] text-[#64748b]">عقود واتفاقيات المجموعة</span>
           </div>
           <div className="w-10 h-10 rounded-xl bg-[#eff4ff] flex items-center justify-center text-[#00685f]">
@@ -115,9 +555,9 @@ export const WorkflowBuilder: React.FC<WorkflowBuilderProps> = ({
               Workflow Topology
             </span>
             <div className="flex items-center gap-2 mt-0.5">
-              <span className="text-base font-bold text-[#0b1c30]">Hybrid Mesh</span>
+              <span className="text-base font-bold text-[#0b1c30]">{currentActiveTemplate.topology}</span>
               <span className="text-[0.65rem] bg-[#71f8e4] text-[#00201c] px-2 py-0.5 rounded-full font-bold">
-                5 Stages
+                {currentActiveTemplate.nodes.length} Stages
               </span>
             </div>
             <span className="text-[0.65rem] text-[#64748b]">متوازي + تسلسلي مشروط</span>
@@ -132,9 +572,9 @@ export const WorkflowBuilder: React.FC<WorkflowBuilderProps> = ({
             <span className="text-[0.7rem] uppercase text-[#64748b] font-medium">
               Max Cumulative SLA
             </span>
-            <span className="text-base font-bold text-[#0b1c30]">{template.maxSlaHours} Hours</span>
+            <span className="text-base font-bold text-[#0b1c30]">{currentActiveTemplate.maxSlaHours} Hours</span>
             <span className="text-[0.65rem] text-[#64748b]">
-              الحد الأقصى للإنجاز: 4 أيام عمل
+              الحد الأقصى للإنجاز: {Math.round(currentActiveTemplate.maxSlaHours / 24)} أيام عمل
             </span>
           </div>
           <div className="w-10 h-10 rounded-xl bg-[#eff4ff] flex items-center justify-center text-[#00685f]">
@@ -502,7 +942,7 @@ export const WorkflowBuilder: React.FC<WorkflowBuilderProps> = ({
                       Document Controller Seal & Hybrid Archive
                     </h3>
                     <p className="text-[0.68rem] text-[#64748b]">
-                      ختم مسؤول المستندات الرسمي والأرشفة السحابية المشفرة (FR-43)
+                      ختم مسؤول الديوان الرسمي والأرشفة السحابية المشفرة (FR-43)
                     </p>
                   </div>
                 </div>
@@ -581,7 +1021,7 @@ export const WorkflowBuilder: React.FC<WorkflowBuilderProps> = ({
                   General Counsel / Legal Lead (المستشار القانوني)
                 </option>
                 <option value="Document Controller">
-                  Document Controller (مسؤول التحكم بالمستندات)
+                  Document Controller (مسؤول التحكم بالديوان)
                 </option>
               </select>
 
@@ -697,7 +1137,7 @@ export const WorkflowBuilder: React.FC<WorkflowBuilderProps> = ({
               <div className="flex flex-col text-xs">
                 <span className="font-bold text-[#0b1c30]">Tamper-Proof Audit Trail</span>
                 <span className="text-[0.65rem] text-[#64748b]">
-                  All updates write directly to the Sanad cryptographic audit ledger.
+                  All updates write directly to the Dewan cryptographic audit ledger.
                 </span>
               </div>
             </div>

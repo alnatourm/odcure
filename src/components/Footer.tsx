@@ -1,12 +1,20 @@
 import React from 'react';
 
-export const Footer: React.FC = () => {
+interface FooterProps {
+  appNameEn?: string;
+  appNameAr?: string;
+}
+
+export const Footer: React.FC<FooterProps> = ({
+  appNameEn = 'Dewan',
+  appNameAr = 'ديوان',
+}) => {
   return (
     <footer className="w-full bg-[#ffffff] border-t border-[#cbd5e1]/30 mt-12">
       <div className="max-w-7xl mx-auto px-4 sm:px-8 py-6 flex flex-col md:flex-row items-center justify-between gap-3 text-[#475569]">
         <div className="flex items-center gap-2">
           <span className="text-xs font-semibold text-[#0b1c30]">
-            Sanad DCS | نظام سند للتحكم بالمستندات
+            {appNameEn} DCS | نظام {appNameAr} للتحكم بالديوان
           </span>
           <span className="text-xs text-[#64748b]">• Enterprise Governance Edition v2.4</span>
         </div>
@@ -20,7 +28,7 @@ export const Footer: React.FC = () => {
         </div>
 
         <div className="text-xs text-center md:text-right text-[#64748b]">
-          © 2026 Sanad Document Intelligence. Flexible Local / Cloud / Hybrid Storage Architecture.
+          © 2026 {appNameEn} Document Intelligence. Flexible Local / Cloud / Hybrid Storage Architecture.
         </div>
       </div>
     </footer>

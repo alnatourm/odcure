@@ -193,7 +193,7 @@ export const AuditComplianceLedger: React.FC<AuditComplianceLedgerProps> = ({
               </span>
               <p className="text-xs text-[#64748b] mt-1">
                 Every micro-transaction is bundled into SHA-256 signed blocks every 120 seconds.
-                Non-repudiation guaranteed by Sanad Governance Core (FR-33).
+                Non-repudiation guaranteed by Dewan Governance Core (FR-33).
               </p>
             </div>
           </div>
@@ -279,7 +279,7 @@ export const AuditComplianceLedger: React.FC<AuditComplianceLedgerProps> = ({
         {(
           [
             { id: 'ALL', label: 'All Events • الكل (84,920)' },
-            { id: 'DOC', label: 'Document Access & Views • عرض المستندات' },
+            { id: 'DOC', label: 'Document Access & Views • عرض الديوان' },
             { id: 'WORKFLOW', label: 'Approvals & Workflow • الموافقات وسير العمل' },
             { id: 'REASSIGN', label: 'Re-assignments (FR-15) • إعادة التعيين' },
             { id: 'STORAGE', label: 'Storage & Encryption (FR-48) • التخزين والتشفير' },

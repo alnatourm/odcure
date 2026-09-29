@@ -49,7 +49,7 @@ export const ViewerOCRModal: React.FC<ViewerOCRModalProps> = ({
       const data = await res.json();
       setAiAnswer(data.answer || 'Query processed.');
     } catch (e) {
-      setAiAnswer(`Sanad AI Assistant: Document complies with classification ${document.classification}.`);
+      setAiAnswer(`Dewan AI Assistant: Document complies with classification ${document.classification}.`);
     } finally {
       setIsAiLoading(false);
     }
@@ -177,7 +177,7 @@ export const ViewerOCRModal: React.FC<ViewerOCRModalProps> = ({
                 </div>
 
                 <div className="relative z-10 flex justify-between items-center text-xs text-[#64748b] pt-4">
-                  <span>Page 1 of 1 • Sanad Document Control Engine v2.4</span>
+                  <span>Page 1 of 1 • Dewan Document Control Engine v2.4</span>
                   <span>ISO 9001 / ISO 27001 Certified</span>
                 </div>
               </div>

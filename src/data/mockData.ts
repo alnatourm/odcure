@@ -4,7 +4,7 @@ export const INITIAL_USERS: AppUser[] = [
   {
     id: 'USR-001',
     name: 'Sarah Jenkins',
-    email: 'sarah.jenkins@sanad-dcs.com',
+    email: 'sarah.jenkins@dewan-dcs.com',
     role: 'Document Controller',
     department: 'Document Control & Compliance',
     clearanceLevel: 'Restricted',
@@ -13,7 +13,7 @@ export const INITIAL_USERS: AppUser[] = [
   {
     id: 'USR-002',
     name: 'Dr. Ziyad Al-Husseini',
-    email: 'ziyad.husseini@sanad-dcs.com',
+    email: 'ziyad.husseini@dewan-dcs.com',
     role: 'Department Head',
     department: 'Governance & Finance',
     clearanceLevel: 'Restricted',
@@ -22,7 +22,7 @@ export const INITIAL_USERS: AppUser[] = [
   {
     id: 'USR-003',
     name: 'Helen Vance',
-    email: 'helen.vance@sanad-dcs.com',
+    email: 'helen.vance@dewan-dcs.com',
     role: 'Approver',
     department: 'HR & Payroll Dept',
     clearanceLevel: 'Confidential',
@@ -31,7 +31,7 @@ export const INITIAL_USERS: AppUser[] = [
   {
     id: 'USR-004',
     name: 'Tariq Mansour',
-    email: 'tariq.mansour@sanad-dcs.com',
+    email: 'tariq.mansour@dewan-dcs.com',
     role: 'Approver',
     department: 'Legal Department',
     clearanceLevel: 'Confidential',
@@ -40,7 +40,7 @@ export const INITIAL_USERS: AppUser[] = [
   {
     id: 'USR-005',
     name: 'Khaled Al-Ansari',
-    email: 'khaled.ansari@sanad-dcs.com',
+    email: 'khaled.ansari@dewan-dcs.com',
     role: 'Contributor',
     department: 'Finance',
     clearanceLevel: 'Internal',
@@ -49,7 +49,7 @@ export const INITIAL_USERS: AppUser[] = [
   {
     id: 'USR-006',
     name: 'Mona Rahimi',
-    email: 'mona.rahimi@sanad-dcs.com',
+    email: 'mona.rahimi@dewan-dcs.com',
     role: 'Contributor',
     department: 'Executive Secretariat',
     clearanceLevel: 'Internal'
@@ -514,7 +514,7 @@ export const INITIAL_WORKFLOW_TEMPLATE: WorkflowTemplate = {
       name: 'Classification & Threshold Gate',
       nameAr: 'بوابة الشروط والمحددات الرقابية',
       subtitle: 'Conditional Rule (FR-19)',
-      subtitleAr: 'شرط توجيه المستندات السرية أو ذات المبالغ الكبيرة',
+      subtitleAr: 'شرط توجيه ديوان السرية أو ذات المبالغ الكبيرة',
       assignedRole: 'Automated Rule Engine',
       slaHours: 1,
       reminderHours: 0,
@@ -549,7 +549,7 @@ export const INITIAL_WORKFLOW_TEMPLATE: WorkflowTemplate = {
       stageNumber: 4,
       stageType: 'TERMINAL',
       name: 'Document Controller Seal & Hybrid Archive',
-      nameAr: 'ختم مسؤول المستندات الرسمي والأرشفة المشفرة',
+      nameAr: 'ختم مسؤول الديوان الرسمي والأرشفة المشفرة',
       subtitle: 'Terminal Node (PDF/A Auto-Stamp & Encryption FR-43)',
       subtitleAr: 'ختم وثيقة الحوكمة والتشفير في مستودع الأرشيف النهائي',
       assignedRole: 'Document Controller',
@@ -608,7 +608,7 @@ export const INITIAL_AUDIT_EVENTS: AuditEvent[] = [
     documentRef: 'DOC-2026-FIN-102',
     documentTitle: 'FY2025 Capex Allocation Matrix',
     actorName: 'Sarah Jenkins',
-    actorRoleAndDept: 'Document Controller • مسؤول المستندات',
+    actorRoleAndDept: 'Document Controller • مسؤول الديوان',
     actionType: 'RE_ASSIGNED',
     details: 'Re-assigned from Legal to Finance: Budget re-allocation protocol (FR-15)',
     rationale: 'Mandate note: Transferred to Tariq Mansour for CAPEX sign-off',

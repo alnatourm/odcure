@@ -1,5 +1,5 @@
 /**
- * Sanad Document Control System (DCS) - TypeScript Types
+ * Dewan Document Control System (DCS) - TypeScript Types
  * Compliant with BRD Version 1.1
  */
 

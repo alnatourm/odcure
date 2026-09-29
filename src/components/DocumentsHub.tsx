@@ -26,6 +26,7 @@ export const DocumentsHub: React.FC<DocumentsHubProps> = ({
 }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string>('All');
+  const [adminViewAll, setAdminViewAll] = useState(false);
 
   const categories = [
     { id: 'All', en: 'All', ar: 'الكل' },
@@ -35,6 +36,10 @@ export const DocumentsHub: React.FC<DocumentsHubProps> = ({
     { id: 'Operations', en: 'Operations', ar: 'العمليات' },
   ];
 
+  const isAdmin = currentUser.role === 'System Administrator' || currentUser.role === 'Document Controller';
+  const isManager = currentUser.role === 'Department Head';
+
+  // Strict RBAC Filtering: Employees/Managers only see assigned or authored documents!
   const filteredDocs = documents.filter((doc) => {
     const matchesSearch =
       doc.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -42,8 +47,38 @@ export const DocumentsHub: React.FC<DocumentsHubProps> = ({
       doc.id.toLowerCase().includes(searchTerm.toLowerCase()) ||
       doc.department.toLowerCase().includes(searchTerm.toLowerCase());
 
-    if (selectedCategory === 'All') return matchesSearch;
-    return matchesSearch && doc.department.toLowerCase().includes(selectedCategory.toLowerCase());
+    if (!matchesSearch) return false;
+    if (selectedCategory !== 'All' && !doc.department.toLowerCase().includes(selectedCategory.toLowerCase())) {
+      return false;
+    }
+
+    // Admin view toggle option
+    if (isAdmin && adminViewAll) {
+      return true;
+    }
+
+    // Role & Identity Assignment check
+    const isOwner = doc.ownerName === currentUser.name || (doc.ownerRoleAndDept && doc.ownerRoleAndDept.includes(currentUser.name));
+    const isAssignee = doc.currentAssigneeName === currentUser.name || (doc.currentAssigneeRoleAndDept && doc.currentAssigneeRoleAndDept.includes(currentUser.name));
+    const isContributor =
+      doc.versionHistory?.some((v) => v.uploadedBy === currentUser.name) ||
+      doc.workflowChain?.some((w) => w.assignedUser === currentUser.name || w.approverName === currentUser.name);
+    const hasGrant = doc.temporaryGrants?.some((tg) =>
+      tg.grantedTo.toLowerCase().includes(currentUser.name.toLowerCase()) ||
+      tg.grantedTo.toLowerCase().includes(currentUser.email.toLowerCase())
+    );
+
+    if (isOwner || isAssignee || isContributor || hasGrant) {
+      return true;
+    }
+
+    // Managers see documents in their department
+    if (isManager && (doc.department.toLowerCase().includes(currentUser.department.toLowerCase()) || doc.assignedDepartment.toLowerCase().includes(currentUser.department.toLowerCase()))) {
+      return true;
+    }
+
+    // Non-assigned document is hidden from employee!
+    return false;
   });
 
   return (
@@ -60,10 +95,10 @@ export const DocumentsHub: React.FC<DocumentsHubProps> = ({
               <span>Central Registry • السجل المركزي</span>
             </div>
             <h1 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-[#0b1c30] tracking-tight">
-              Documents Hub <span className="font-normal text-[#00685f]">| مركز المستندات</span>
+              Documents Hub <span className="font-normal text-[#00685f]">| مركز الديوان</span>
             </h1>
             <p className="text-sm sm:text-base text-[#475569] leading-relaxed">
-              Organize, access, and verify company records with ease • تنظيم والوصول وتدقيق مستندات
+              Organize, access, and verify company records with ease • تنظيم والوصول وتدقيق ديوان
               المؤسسة بكل سلاسة وموثوقية
             </p>
           </div>
@@ -96,7 +131,7 @@ export const DocumentsHub: React.FC<DocumentsHubProps> = ({
         <div className="bg-white rounded-2xl p-5 sm:p-6 border border-[#cbd5e1]/30 shadow-xs flex items-start justify-between hover:border-[#00685f]/40 transition-colors">
           <div className="space-y-1.5">
             <span className="text-[0.7rem] uppercase tracking-wider text-[#475569] font-semibold block">
-              TOTAL DOCUMENTS • إجمالي المستندات
+              TOTAL DOCUMENTS • إجمالي الديوان
             </span>
             <div className="text-3xl font-extrabold text-[#0b1c30]">1,428</div>
             <div className="flex items-center gap-1.5 text-xs text-[#00685f] font-medium pt-1">
@@ -147,7 +182,7 @@ export const DocumentsHub: React.FC<DocumentsHubProps> = ({
         <div className="bg-white rounded-2xl p-5 sm:p-6 border border-[#cbd5e1]/30 shadow-xs flex items-start justify-between hover:border-[#00685f]/40 transition-colors">
           <div className="space-y-1.5">
             <span className="text-[0.7rem] uppercase tracking-wider text-[#475569] font-semibold block">
-              RESTRICTED & PAYROLL • مستندات سرية
+              RESTRICTED & PAYROLL • ديوان سرية
             </span>
             <div className="text-3xl font-extrabold text-[#0b1c30]">24</div>
             <div className="flex items-center gap-1.5 text-xs text-[#475569] font-medium pt-1">
@@ -206,12 +241,60 @@ export const DocumentsHub: React.FC<DocumentsHubProps> = ({
         </div>
       </section>
 
+      {/* RBAC Access Isolation Banner */}
+      <div className="bg-[#eff4ff] border border-[#00685f]/30 rounded-2xl p-4 sm:p-5 flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div className="flex items-start gap-3">
+          <div className="w-9 h-9 rounded-xl bg-[#00685f]/10 text-[#00685f] flex items-center justify-center shrink-0 mt-0.5">
+            <span className="material-symbols-outlined text-xl">shield_person</span>
+          </div>
+          <div className="space-y-0.5">
+            <div className="flex items-center gap-2">
+              <span className="font-bold text-xs text-[#0b1c30]">
+                {lang === 'AR' ? 'عزل ديوان الموظفين (نظام الحوكمة النشط)' : 'Employee Document Access Isolation Enforced'}
+              </span>
+              <span className="text-[0.65rem] bg-[#00685f] text-white px-2 py-0.5 rounded-full font-semibold">
+                {currentUser.role}
+              </span>
+            </div>
+            <p className="text-xs text-[#475569]">
+              {lang === 'AR'
+                ? `تعرض هذه القائمة فقط الديوان المخصصة للموظف (${currentUser.name}) أو التي عمل عليها بنفسه في قسم ${currentUser.department}. لا يمكن استعراض الديوان غير المخصصة لك.`
+                : `Showing ${filteredDocs.length} document(s) assigned to or created by ${currentUser.name} (${currentUser.department}). Non-assigned company documents are hidden.`}
+            </p>
+          </div>
+        </div>
+
+        {/* Admin Toggle to View Full Repository */}
+        {isAdmin && (
+          <button
+            type="button"
+            onClick={() => setAdminViewAll(!adminViewAll)}
+            className={`px-4 py-2 rounded-xl text-xs font-bold transition-all border shrink-0 cursor-pointer flex items-center gap-1.5 ${
+              adminViewAll
+                ? 'bg-purple-700 text-white border-purple-800 shadow-xs'
+                : 'bg-white text-purple-800 border-purple-300 hover:bg-purple-50'
+            }`}
+          >
+            <span className="material-symbols-outlined text-base">admin_panel_settings</span>
+            <span>
+              {adminViewAll
+                ? lang === 'AR' ? 'الرجوع لنطاق الموظف' : 'Exit Admin View (My Docs)'
+                : lang === 'AR' ? 'عرض كافة ديوان الشركة (صلاحية المدير)' : 'Admin View All Company Docs'}
+            </span>
+          </button>
+        )}
+      </div>
+
       {/* Document Cards / Active Repository Catalog */}
       <section className="bg-white rounded-2xl p-5 sm:p-7 lg:p-8 border border-[#cbd5e1]/30 shadow-xs space-y-5">
         <div className="flex items-center justify-between border-b border-[#cbd5e1]/30 pb-4">
           <div className="flex items-center gap-2">
-            <h2 className="font-bold text-lg text-[#0b1c30]">Active Repository</h2>
-            <span className="text-xs text-[#64748b] font-normal">| المستودع النشط</span>
+            <h2 className="font-bold text-lg text-[#0b1c30]">
+              {isAdmin && adminViewAll ? 'All Company Repository (Admin Mode)' : 'My Assigned & Authored Documents'}
+            </h2>
+            <span className="text-xs text-[#64748b] font-normal">
+              | {isAdmin && adminViewAll ? 'المستودع الكامل للمؤسسة' : 'الديوان المخصصة لي'}
+            </span>
           </div>
           <span className="text-xs text-[#475569]">
             Showing {filteredDocs.length} of {documents.length} documents

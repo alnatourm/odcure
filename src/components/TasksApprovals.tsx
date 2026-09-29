@@ -56,7 +56,7 @@ export const TasksApprovals: React.FC<TasksApprovalsProps> = ({
               Tasks & Approvals <span className="text-[#00685f] font-normal">| المهام والموافقات</span>
             </h1>
             <p className="text-sm text-[#475569]">
-              Review pending documents requiring your sign-off • مراجعة المستندات المعلقة التي
+              Review pending documents requiring your sign-off • مراجعة الديوان المعلقة التي
               تتطلب اعتمادك وتوقيعك
             </p>
           </div>

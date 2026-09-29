@@ -6,6 +6,8 @@ import { WorkflowBuilder } from './components/WorkflowBuilder';
 import { AuditComplianceLedger } from './components/AuditComplianceLedger';
 import { ViewerOCRModal } from './components/ViewerOCRModal';
 import { StorageSecurityAdmin } from './components/StorageSecurityAdmin';
+import { DepartmentDirectoryAdmin } from './components/DepartmentDirectoryAdmin';
+import { AuthModal } from './components/AuthModal';
 import { UploadModal } from './components/UploadModal';
 import { ReassignModal } from './components/ReassignModal';
 import { QuickFindModal } from './components/QuickFindModal';
@@ -42,15 +44,49 @@ export default function App() {
   const [storageRules, setStorageRules] = useState<StorageBackendRule[]>(INITIAL_STORAGE_RULES);
   const [currentStorageModel, setCurrentStorageModel] = useState<StorageModel>('Hybrid');
 
-  // User Personas
-  const [users] = useState<AppUser[]>(INITIAL_USERS);
+  // User Personas & Registration
+  const [users, setUsers] = useState<AppUser[]>(INITIAL_USERS);
   const [currentUser, setCurrentUser] = useState<AppUser>(INITIAL_USERS[0]); // Sarah Jenkins
+
+  const handleRegisterUser = (newUser: AppUser) => {
+    setUsers((prev) => [newUser, ...prev]);
+  };
+
+  // Web Application Branding State
+  const [appNameEn, setAppNameEn] = useState<string>(() => {
+    const val = localStorage.getItem('dewan_app_name_en');
+    return (val && val !== 'Sanad' && val !== 'sanad') ? val : 'Dewan';
+  });
+  const [appNameAr, setAppNameAr] = useState<string>(() => {
+    const val = localStorage.getItem('dewan_app_name_ar');
+    return (val && val !== 'سند' && val !== 'sanad') ? val : 'ديوان';
+  });
+  const [appTagline, setAppTagline] = useState<string>(() => {
+    const val = localStorage.getItem('dewan_app_tagline');
+    return (val && !val.includes('المستندات')) ? val : 'Document Control • إدارة الديوان';
+  });
+
+  // Ensure legacy storage is cleared and new Dewan branding is set
+  useEffect(() => {
+    localStorage.removeItem('sanad_app_name_en');
+    localStorage.removeItem('sanad_app_name_ar');
+    localStorage.removeItem('sanad_app_tagline');
+    if (appNameAr === 'سند' || !appNameAr) {
+      setAppNameAr('ديوان');
+      localStorage.setItem('dewan_app_name_ar', 'ديوان');
+    }
+    if (appNameEn === 'Sanad' || !appNameEn) {
+      setAppNameEn('Dewan');
+      localStorage.setItem('dewan_app_name_en', 'Dewan');
+    }
+  }, [appNameAr, appNameEn]);
 
   // Modal States
   const [selectedDocForViewer, setSelectedDocForViewer] = useState<DocumentItem | null>(null);
   const [selectedDocForReassign, setSelectedDocForReassign] = useState<DocumentItem | null>(null);
   const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
   const [isQuickFindOpen, setIsQuickFindOpen] = useState(false);
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
 
   // Toast Notification State
   const [toastMessage, setToastMessage] = useState<string | null>(null);
@@ -186,7 +222,7 @@ export default function App() {
     } catch (e) {
       // Fallback browser download
       const blob = new Blob([
-        `SANAD (سند) CONTROLLED DOCUMENT RECORD\nReference ID: ${doc.id}\nTitle: ${doc.title}\nVersion: ${doc.version}\nClassification: ${doc.classification}\nDepartment: ${doc.department}\nStatus: ${doc.status}\nStorage: ${doc.storageModel}\nDownloaded By: ${currentUser.name}\nTimestamp: ${new Date().toISOString()}\n\nVerified under Sanad DCS Governance Policies FR-13 & FR-47.`
+        `DEWAN (ديوان) CONTROLLED DOCUMENT RECORD\nReference ID: ${doc.id}\nTitle: ${doc.title}\nVersion: ${doc.version}\nClassification: ${doc.classification}\nDepartment: ${doc.department}\nStatus: ${doc.status}\nStorage: ${doc.storageModel}\nDownloaded By: ${currentUser.name}\nTimestamp: ${new Date().toISOString()}\n\nVerified under Dewan DCS Governance Policies FR-13 & FR-47.`
       ], { type: 'text/plain;charset=utf-8' });
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
@@ -371,7 +407,15 @@ export default function App() {
           setCurrentUser={setCurrentUser}
           users={users}
           onOpenQuickFind={() => setIsQuickFindOpen(true)}
+          onOpenAuthModal={() => setIsAuthModalOpen(true)}
           pendingTasksCount={documents.filter((d) => d.status === 'Pending Approval').length}
+          appNameEn={appNameEn}
+          setAppNameEn={setAppNameEn}
+          appNameAr={appNameAr}
+          setAppNameAr={setAppNameAr}
+          appTagline={appTagline}
+          setAppTagline={setAppTagline}
+          onShowToast={showToast}
         />
 
         {/* Main Content Area */}
@@ -471,6 +515,16 @@ export default function App() {
             />
           )}
 
+          {currentTab === 'directory' && (
+            <DepartmentDirectoryAdmin
+              users={users}
+              currentUser={currentUser}
+              lang={lang}
+              onAddEmployee={() => setIsAuthModalOpen(true)}
+              onShowToast={showToast}
+            />
+          )}
+
           {currentTab === 'audit' && (
             <AuditComplianceLedger
               events={auditEvents}
@@ -485,7 +539,7 @@ export default function App() {
       </div>
 
       {/* Footer */}
-      <Footer />
+      <Footer appNameEn={appNameEn} appNameAr={appNameAr} />
 
       {/* Modals */}
       {selectedDocForViewer && (
@@ -528,6 +582,18 @@ export default function App() {
           onSelectDocument={handleSelectDocument}
         />
       )}
+
+      {/* Auth & Employee Registration Modal */}
+      <AuthModal
+        isOpen={isAuthModalOpen}
+        onClose={() => setIsAuthModalOpen(false)}
+        currentUser={currentUser}
+        setCurrentUser={setCurrentUser}
+        users={users}
+        onRegisterUser={handleRegisterUser}
+        lang={lang}
+        onShowToast={showToast}
+      />
 
       {/* Interactive Toast Notification */}
       {toastMessage && (
